@@ -32,4 +32,19 @@ List<Product> dummyProducts = [
     imageUrl:
         'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
   ),
+  Product(
+    id: 'p5',
+    title: 'A Fan',
+    description: 'Make the air cooler.',
+    price: 29.99,
+    imageUrl: 'https://cdn.britannica.com/38/122038-004-95F22382/fan.jpg',
+  ),
+  Product(
+    id: 'p6',
+    title: 'Bed',
+    description: 'Make your sleep better.',
+    price: 59.99,
+    imageUrl:
+        'https://pyxis.nymag.com/v1/imgs/17b/d1d/2fbe4ae55704cccca13681a08be3ccd509-bed-frames.2x.rsocial.w600.jpg',
+  ),
 ];
