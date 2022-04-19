@@ -20,8 +20,11 @@ class ProductItem extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: GestureDetector(
-        onTap: () =>
-            Navigator.pushNamed(context, ProductDetailScreen.routeName),
+        onTap: () => Navigator.pushNamed(
+          context,
+          ProductDetailScreen.routeName,
+          arguments: id,
+        ),
         child: GridTile(
           child: Image.network(
             imageUrl,
