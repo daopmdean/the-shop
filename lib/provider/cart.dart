@@ -56,4 +56,9 @@ class Cart with ChangeNotifier {
   String cartKey(CartItem cartItem) {
     return _cart.keys.firstWhere((key) => _cart[key].id == cartItem.id);
   }
+
+  void clearCart() {
+    _cart = {};
+    notifyListeners();
+  }
 }
