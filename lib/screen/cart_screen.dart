@@ -54,6 +54,7 @@ class CartScreen extends StatelessWidget {
               itemCount: cart.countItems,
               itemBuilder: (ctx, index) => CartCard(
                 cartItem: cart.cartItems[index],
+                productId: cart.cartKey(cart.cartItems[index]),
               ),
             ),
           ),

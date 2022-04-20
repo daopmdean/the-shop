@@ -47,4 +47,13 @@ class Cart with ChangeNotifier {
     }
     notifyListeners();
   }
+
+  void removeItem(String productId) {
+    _cart.remove(productId);
+    notifyListeners();
+  }
+
+  String cartKey(CartItem cartItem) {
+    return _cart.keys.firstWhere((key) => _cart[key].id == cartItem.id);
+  }
 }
