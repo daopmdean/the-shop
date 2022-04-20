@@ -4,12 +4,25 @@ import 'package:the_shop/model/cart_item.dart';
 class Cart with ChangeNotifier {
   Map<String, CartItem> _cart = {};
 
-  Map<String, CartItem> get cart {
+  Map<String, CartItem> get cartMap {
     return {..._cart};
+  }
+
+  List<CartItem> get cartItems {
+    return cartMap.values.toList();
   }
 
   int get countItems {
     return _cart.length;
+  }
+
+  double get totalAmount {
+    var total = 0.0;
+    _cart.forEach((productId, cartItem) {
+      total += cartItem.quantity * cartItem.price;
+    });
+
+    return total;
   }
 
   void addItem(String productId, String title, double price) {
