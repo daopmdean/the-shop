@@ -9,6 +9,10 @@ class Orders with ChangeNotifier {
     return [..._orders];
   }
 
+  int get countOrders {
+    return _orders.length;
+  }
+
   void addOrder(double total, List<CartItem> cartItems) {
     OrderItem orderItem = OrderItem(
       id: DateTime.now().toString(),
