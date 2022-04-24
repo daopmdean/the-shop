@@ -16,8 +16,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
   final _form = GlobalKey<FormState>();
   var _editedProduct = Product(
     id: null,
-    title: '',
-    description: '',
+    title: null,
+    description: null,
     price: 0,
     imageUrl: '',
   );
@@ -58,6 +58,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 decoration: InputDecoration(labelText: 'Title'),
                 textInputAction: TextInputAction.next,
                 autofocus: true,
+                validator: _validateTitle,
                 onSaved: (value) {
                   _editedProduct = Product(
                     id: null,
@@ -72,6 +73,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 decoration: InputDecoration(labelText: 'Price'),
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
+                validator: _validatePrice,
                 onSaved: (value) {
                   _editedProduct = Product(
                     id: null,
@@ -86,6 +88,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 decoration: InputDecoration(labelText: 'Description'),
                 maxLines: 3,
                 keyboardType: TextInputType.multiline,
+                validator: _validateDescription,
                 onSaved: (value) {
                   _editedProduct = Product(
                     id: null,
@@ -125,6 +128,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       onEditingComplete: () {
                         setState(() {});
                       },
+                      validator: _validateImageUrl,
                       onSaved: (value) {
                         _editedProduct = Product(
                           id: null,
@@ -147,16 +151,61 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   void _updateFocusNode() {
     if (!_imageUrlFocusNode.hasFocus) {
+      var validImageUrl = _validateImageUrl(_imageUrlController.text) == null;
+      if (!validImageUrl) {
+        return;
+      }
       setState(() {});
     }
   }
 
   void _saveForm() {
+    final valid = _form.currentState.validate();
+    if (!valid) {
+      print('Invalid form');
+    }
     _form.currentState.save();
     print(_editedProduct.id);
     print(_editedProduct.title);
     print(_editedProduct.price);
     print(_editedProduct.description);
     print(_editedProduct.imageUrl);
+  }
+
+  String _validateTitle(String value) {
+    if (value.isEmpty) {
+      return 'Title required';
+    }
+    return null;
+  }
+
+  String _validatePrice(String value) {
+    if (value.isEmpty) {
+      return 'Price required';
+    }
+    if (double.tryParse(value) == null) {
+      return 'Price must be number';
+    }
+    if (double.tryParse(value) <= 0) {
+      return 'Price must be greater than 0';
+    }
+    return null;
+  }
+
+  String _validateDescription(String value) {
+    if (value.isEmpty) {
+      return 'Description required';
+    }
+    return null;
+  }
+
+  String _validateImageUrl(String value) {
+    if (value.isEmpty) {
+      return 'Image URL required';
+    }
+    if (!value.startsWith('https')) {
+      return 'Image URL must start with https';
+    }
+    return null;
   }
 }
