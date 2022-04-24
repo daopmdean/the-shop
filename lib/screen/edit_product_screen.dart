@@ -1,7 +1,9 @@
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:the_shop/model/product.dart';
+import 'package:the_shop/provider/products.dart';
 
 class EditProductScreen extends StatefulWidget {
   static const routeName = '/editProduct';
@@ -163,13 +165,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
     final valid = _form.currentState.validate();
     if (!valid) {
       print('Invalid form');
+      return;
     }
+
     _form.currentState.save();
-    print(_editedProduct.id);
-    print(_editedProduct.title);
-    print(_editedProduct.price);
-    print(_editedProduct.description);
-    print(_editedProduct.imageUrl);
+    Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    Navigator.of(context).pop();
   }
 
   String _validateTitle(String value) {
