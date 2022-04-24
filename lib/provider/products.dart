@@ -26,6 +26,24 @@ class Products with ChangeNotifier {
     notifyListeners();
   }
 
+  void updateProduct(Product product) {
+    final prodIndex = _items.indexWhere((prod) => prod.id == product.id);
+    if (prodIndex >= 0) {
+      final newProduct = Product(
+        id: product.id,
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl,
+        isFavorite: _items[prodIndex].isFavorite,
+      );
+      _items[prodIndex] = newProduct;
+    } else {
+      print('No product found');
+    }
+    notifyListeners();
+  }
+
   Product findById(String id) {
     return _items.firstWhere((prod) => prod.id == id);
   }

@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_shop/model/product.dart';
@@ -21,13 +19,30 @@ class _EditProductScreenState extends State<EditProductScreen> {
     title: null,
     description: null,
     price: 0,
-    imageUrl: '',
+    imageUrl: null,
   );
+  var _isInit = true;
+  var _isEdit = false;
 
   @override
   void initState() {
     super.initState();
     _imageUrlFocusNode.addListener(_updateFocusNode);
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      var productId = ModalRoute.of(context).settings.arguments as String;
+      if (productId != null) {
+        _editedProduct =
+            Provider.of<Products>(context, listen: false).findById(productId);
+        _imageUrlController.text = _editedProduct.imageUrl;
+        _isEdit = true;
+      }
+    }
+    _isInit = false;
+    super.didChangeDependencies();
   }
 
   @override
@@ -42,7 +57,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Product'),
+        title: Text(_isEdit ? 'Edit Product' : 'Add Product'),
         actions: [
           IconButton(
             icon: Icon(Icons.save),
@@ -57,13 +72,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
           child: ListView(
             children: [
               TextFormField(
+                initialValue: _editedProduct.title,
                 decoration: InputDecoration(labelText: 'Title'),
                 textInputAction: TextInputAction.next,
                 autofocus: true,
                 validator: _validateTitle,
                 onSaved: (value) {
                   _editedProduct = Product(
-                    id: null,
+                    id: _editedProduct.id,
                     title: value,
                     description: _editedProduct.description,
                     price: _editedProduct.price,
@@ -72,13 +88,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 },
               ),
               TextFormField(
+                initialValue: _editedProduct.price.toString(),
                 decoration: InputDecoration(labelText: 'Price'),
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
                 validator: _validatePrice,
                 onSaved: (value) {
                   _editedProduct = Product(
-                    id: null,
+                    id: _editedProduct.id,
                     title: _editedProduct.title,
                     description: _editedProduct.description,
                     price: double.tryParse(value),
@@ -87,13 +104,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 },
               ),
               TextFormField(
+                initialValue: _editedProduct.description,
                 decoration: InputDecoration(labelText: 'Description'),
                 maxLines: 3,
                 keyboardType: TextInputType.multiline,
                 validator: _validateDescription,
                 onSaved: (value) {
                   _editedProduct = Product(
-                    id: null,
+                    id: _editedProduct.id,
                     title: _editedProduct.title,
                     description: value,
                     price: _editedProduct.price,
@@ -133,7 +151,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       validator: _validateImageUrl,
                       onSaved: (value) {
                         _editedProduct = Product(
-                          id: null,
+                          id: _editedProduct.id,
                           title: _editedProduct.title,
                           description: _editedProduct.description,
                           price: _editedProduct.price,
@@ -169,7 +187,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
 
     _form.currentState.save();
-    Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+
+    if (_isEdit) {
+      Provider.of<Products>(context, listen: false)
+          .updateProduct(_editedProduct);
+    } else {
+      Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    }
     Navigator.of(context).pop();
   }
 
