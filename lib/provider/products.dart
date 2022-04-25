@@ -62,9 +62,19 @@ class Products with ChangeNotifier {
     }
   }
 
-  void updateProduct(Product product) {
+  Future<void> updateProduct(Product product) async {
     final prodIndex = _items.indexWhere((prod) => prod.id == product.id);
     if (prodIndex >= 0) {
+      final uri = Uri.parse(
+          'https://the-shop-48986-default-rtdb.asia-southeast1.firebasedatabase.app/products/${product.id}.json');
+      final body = json.encode({
+        'title': product.title,
+        'description': product.description,
+        'imageUrl': product.imageUrl,
+        'price': product.price,
+      });
+      await http.patch(uri, body: body);
+
       final newProduct = Product(
         id: product.id,
         title: product.title,
@@ -78,17 +88,6 @@ class Products with ChangeNotifier {
       print('No product found');
     }
     notifyListeners();
-    const url =
-        'https://the-shop-48986-default-rtdb.asia-southeast1.firebasedatabase.app/products.json';
-    final uri = Uri.parse(url);
-    final body = json.encode({
-      'title': product.title,
-      'description': product.description,
-      'imageUrl': product.imageUrl,
-      'price': product.price,
-      'isFavorite': product.isFavorite,
-    });
-    http.post(uri, body: body);
   }
 
   void deleteProduct(Product product) {
