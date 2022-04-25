@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:the_shop/dummy_data.dart';
 import 'package:the_shop/model/product.dart';
 
@@ -14,16 +17,29 @@ class Products with ChangeNotifier {
   }
 
   void addProduct(Product product) {
-    final newProduct = Product(
-      id: DateTime.now().toString(),
-      title: product.title,
-      description: product.description,
-      price: product.price,
-      imageUrl: product.imageUrl,
-    );
-    _items.add(newProduct);
+    const url =
+        'https://the-shop-48986-default-rtdb.asia-southeast1.firebasedatabase.app/products.json';
+    final uri = Uri.parse(url);
+    final body = json.encode({
+      'title': product.title,
+      'description': product.description,
+      'imageUrl': product.imageUrl,
+      'price': product.price,
+      'isFavorite': product.isFavorite,
+    });
 
-    notifyListeners();
+    http.post(uri, body: body).then((res) {
+      final newProduct = Product(
+        id: json.decode(res.body)['name'],
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl,
+      );
+      _items.add(newProduct);
+
+      notifyListeners();
+    });
   }
 
   void updateProduct(Product product) {
@@ -42,6 +58,17 @@ class Products with ChangeNotifier {
       print('No product found');
     }
     notifyListeners();
+    const url =
+        'https://the-shop-48986-default-rtdb.asia-southeast1.firebasedatabase.app/products.json';
+    final uri = Uri.parse(url);
+    final body = json.encode({
+      'title': product.title,
+      'description': product.description,
+      'imageUrl': product.imageUrl,
+      'price': product.price,
+      'isFavorite': product.isFavorite,
+    });
+    http.post(uri, body: body);
   }
 
   void deleteProduct(Product product) {
