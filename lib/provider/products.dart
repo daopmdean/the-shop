@@ -6,6 +6,8 @@ import 'package:the_shop/dummy_data.dart';
 import 'package:the_shop/model/product.dart';
 
 class Products with ChangeNotifier {
+  final uri = Uri.parse(
+      'https://the-shop-48986-default-rtdb.asia-southeast1.firebasedatabase.app/products.json');
   List<Product> _items = dummyProducts;
 
   List<Product> get items {
@@ -16,10 +18,25 @@ class Products with ChangeNotifier {
     return _items.where((product) => product.isFavorite).toList();
   }
 
+  Future<void> fetchAndSetProducts() async {
+    final res = await http.get(uri);
+    final resData = json.decode(res.body) as Map<String, dynamic>;
+    final List<Product> loadedProducts = [];
+    resData.forEach((prodId, prodData) {
+      loadedProducts.add(Product(
+        id: prodId,
+        title: prodData['title'],
+        description: prodData['description'],
+        price: prodData['price'],
+        imageUrl: prodData['imageUrl'],
+        isFavorite: prodData['isFavorite'],
+      ));
+    });
+    _items = loadedProducts;
+    notifyListeners();
+  }
+
   Future<void> addProduct(Product product) async {
-    const url =
-        'https://the-shop-48986-default-rtdb.asia-southeast1.firebasedatabase.app/products';
-    final uri = Uri.parse(url);
     final body = json.encode({
       'title': product.title,
       'description': product.description,
