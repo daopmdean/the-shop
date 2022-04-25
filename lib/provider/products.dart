@@ -16,9 +16,9 @@ class Products with ChangeNotifier {
     return _items.where((product) => product.isFavorite).toList();
   }
 
-  Future<void> addProduct(Product product) {
+  Future<void> addProduct(Product product) async {
     const url =
-        'https://the-shop-48986-default-rtdb.asia-southeast1.firebasedatabase.app/products.json';
+        'https://the-shop-48986-default-rtdb.asia-southeast1.firebasedatabase.app/products';
     final uri = Uri.parse(url);
     final body = json.encode({
       'title': product.title,
@@ -28,7 +28,8 @@ class Products with ChangeNotifier {
       'isFavorite': product.isFavorite,
     });
 
-    return http.post(uri, body: body).then((res) {
+    try {
+      final res = await http.post(uri, body: body);
       final newProduct = Product(
         id: json.decode(res.body)['name'],
         title: product.title,
@@ -36,12 +37,12 @@ class Products with ChangeNotifier {
         price: product.price,
         imageUrl: product.imageUrl,
       );
-      _items.add(newProduct);
 
+      _items.add(newProduct);
       notifyListeners();
-    }).catchError((error) {
+    } catch (error) {
       throw error;
-    });
+    }
   }
 
   void updateProduct(Product product) {
