@@ -16,7 +16,7 @@ class Products with ChangeNotifier {
     return _items.where((product) => product.isFavorite).toList();
   }
 
-  void addProduct(Product product) {
+  Future<void> addProduct(Product product) {
     const url =
         'https://the-shop-48986-default-rtdb.asia-southeast1.firebasedatabase.app/products.json';
     final uri = Uri.parse(url);
@@ -28,7 +28,7 @@ class Products with ChangeNotifier {
       'isFavorite': product.isFavorite,
     });
 
-    http.post(uri, body: body).then((res) {
+    return http.post(uri, body: body).then((res) {
       final newProduct = Product(
         id: json.decode(res.body)['name'],
         title: product.title,
