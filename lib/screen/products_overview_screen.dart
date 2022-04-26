@@ -43,15 +43,6 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
         title: Text('The Shop'),
         actions: [
           PopupMenuButton(
-            onSelected: (value) {
-              setState(() {
-                if (value == FilterOptions.Favorites) {
-                  showFav = true;
-                } else if (value == FilterOptions.All) {
-                  showFav = false;
-                }
-              });
-            },
             icon: Icon(Icons.more_vert),
             itemBuilder: (_) => [
               PopupMenuItem(
@@ -63,6 +54,15 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
                 value: FilterOptions.All,
               ),
             ],
+            onSelected: (value) {
+              setState(() {
+                if (value == FilterOptions.Favorites) {
+                  showFav = true;
+                } else if (value == FilterOptions.All) {
+                  showFav = false;
+                }
+              });
+            },
           ),
           Consumer<Cart>(
             builder: (context, cart, child) => Badge(
