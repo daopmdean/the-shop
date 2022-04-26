@@ -12,36 +12,44 @@ class OrdersScreen extends StatefulWidget {
 }
 
 class _OrdersScreenState extends State<OrdersScreen> {
-  var _isLoading;
+  Future _ordersFuture;
+
+  Future _obtainOrdersFuture() {
+    return Provider.of<Orders>(context, listen: false).fetchOrders();
+  }
 
   @override
   void initState() {
     super.initState();
-    _isLoading = true;
-    Provider.of<Orders>(context, listen: false).fetchOrders().then((_) {
-      setState(() {
-        _isLoading = false;
-      });
-    });
+    _ordersFuture = _obtainOrdersFuture();
   }
 
   @override
   Widget build(BuildContext context) {
-    final orders = Provider.of<Orders>(context);
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Your Orders'),
       ),
       drawer: AppDrawer(),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : ListView.builder(
+      body: FutureBuilder(
+        future: _ordersFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error occurred'));
+          }
+          return Consumer<Orders>(
+            builder: (ctx, orders, child) => ListView.builder(
               itemCount: orders.countOrders,
               itemBuilder: (ctx, i) => OrderCard(
                 order: orders.orders[i],
               ),
             ),
+          );
+        },
+      ),
     );
   }
 }
