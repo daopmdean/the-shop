@@ -19,14 +19,12 @@ class ProductsOverviewScreen extends StatefulWidget {
 
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   var showFav = false;
-  var _isLoading = true;
+  var _isLoading;
 
   @override
   void initState() {
     super.initState();
-    setState(() {
-      _isLoading = true;
-    });
+    _isLoading = true;
     Provider.of<Products>(context, listen: false)
         .fetchAndSetProducts()
         .then((_) {
