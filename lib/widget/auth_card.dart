@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:the_shop/model/app_exception.dart';
 import 'package:the_shop/provider/auth.dart';
 import 'package:the_shop/screen/auth_screen.dart';
 
@@ -136,8 +137,10 @@ class _AuthCardState extends State<AuthCard> {
           _authData['email'],
           _authData['password'],
         );
+      } on AppException catch (error) {
+        _showErrorDialog(error.message);
       } catch (error) {
-        print('login error');
+        _showErrorDialog(error.toString());
       }
     } else {
       try {
@@ -145,8 +148,10 @@ class _AuthCardState extends State<AuthCard> {
           _authData['email'],
           _authData['password'],
         );
+      } on AppException catch (error) {
+        _showErrorDialog(error.message);
       } catch (error) {
-        print('signup error');
+        _showErrorDialog(error.toString());
       }
     }
     setState(() {
@@ -164,5 +169,23 @@ class _AuthCardState extends State<AuthCard> {
         _authMode = AuthMode.Login;
       });
     }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Error Occurred!'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            child: Text('OK'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          )
+        ],
+      ),
+    );
   }
 }

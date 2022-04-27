@@ -9,7 +9,7 @@ import 'package:the_shop/model/product.dart';
 class Products with ChangeNotifier {
   final uri = Uri.parse(
       'https://the-shop-48986-default-rtdb.asia-southeast1.firebasedatabase.app/products.json');
-  List<Product> _items = dummyProducts;
+  List<Product> _items = [];
 
   List<Product> get items {
     return [..._items];
@@ -25,7 +25,7 @@ class Products with ChangeNotifier {
     if (resData == null) {
       return;
     }
-
+    print(resData);
     final List<Product> loadedProducts = [];
     resData.forEach((prodId, prodData) {
       loadedProducts.add(Product.fromJson(prodData, prodId));

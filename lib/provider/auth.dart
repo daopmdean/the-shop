@@ -11,6 +11,19 @@ class Auth with ChangeNotifier {
 
   final url = 'https://identitytoolkit.googleapis.com/v1/accounts';
 
+  bool get isAuth {
+    return token != null;
+  }
+
+  String get token {
+    if (_expiryDate != null &&
+        _expiryDate.isAfter(DateTime.now()) &&
+        _token != null) {
+      return _token;
+    }
+    return null;
+  }
+
   Future<void> signup(String email, String password) async {
     final uri =
         Uri.parse(url + ':signUp?key=AIzaSyArZw8sRnABUeAVuS1RASeMVQrjSJUsqk4');
@@ -20,12 +33,20 @@ class Auth with ChangeNotifier {
       'returnSecureToken': true,
     });
     final res = await http.post(uri, body: body);
+    final resData = json.decode(res.body);
     if (res.statusCode >= 400) {
-      print(res.body);
+      var errorMessage = resData['error']['message'] as String;
+      if (errorMessage.contains('EMAIL_EXISTS')) {
+        throw AppException('Email already exist');
+      }
       throw AppException('Fail to sign up user');
     }
+    _token = resData['idToken'];
+    _userId = resData['localId'];
+    var expiresIn = resData['expiresIn'] as int;
+    _expiryDate = DateTime.now().add(Duration(seconds: expiresIn));
 
-    print(res.body);
+    notifyListeners();
   }
 
   Future<void> login(String email, String password) async {
@@ -37,11 +58,18 @@ class Auth with ChangeNotifier {
       'returnSecureToken': true,
     });
     final res = await http.post(uri, body: body);
+    final resData = json.decode(res.body);
     if (res.statusCode >= 400) {
       print(res.body);
       throw AppException('Fail to login user');
     }
 
-    print(res.body);
+    _token = resData['idToken'];
+    _userId = resData['localId'];
+    print(resData['expiresIn'] is int);
+    var expiresIn = int.parse(resData['expiresIn']);
+    _expiryDate = DateTime.now().add(Duration(seconds: expiresIn));
+
+    notifyListeners();
   }
 }
