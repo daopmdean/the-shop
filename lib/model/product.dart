@@ -21,6 +21,40 @@ class Product with ChangeNotifier {
     this.isFavorite = false,
   });
 
+  // Product fromJson(Map<String, dynamic> json) {
+  //   return Product(
+  //     id: json['id'],
+  //     title: json['title'],
+  //     description: json['description'],
+  //     imageUrl: json['imageUrl'],
+  //     isFavorite: json['isFavorite'],
+  //   );
+  // }
+
+  Product.fromJson(Map<String, dynamic> json, this.id)
+      : title = json['title'],
+        description = json['description'],
+        price = json['price'],
+        imageUrl = json['imageUrl'],
+        isFavorite = json['isFavorite'];
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'description': description,
+        'price': price,
+        'imageUrl': imageUrl,
+        'isFavorite': isFavorite,
+      };
+
+  Map<String, dynamic> toJsonWithoutFav() => {
+        'id': id,
+        'title': title,
+        'description': description,
+        'price': price,
+        'imageUrl': imageUrl,
+      };
+
   Future<void> toggleFavorite() async {
     final uri = Uri.parse(
         'https://the-shop-48986-default-rtdb.asia-southeast1.firebasedatabase.app/products/$id.json');

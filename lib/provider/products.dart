@@ -28,27 +28,14 @@ class Products with ChangeNotifier {
 
     final List<Product> loadedProducts = [];
     resData.forEach((prodId, prodData) {
-      loadedProducts.add(Product(
-        id: prodId,
-        title: prodData['title'],
-        description: prodData['description'],
-        price: prodData['price'],
-        imageUrl: prodData['imageUrl'],
-        isFavorite: prodData['isFavorite'],
-      ));
+      loadedProducts.add(Product.fromJson(prodData, prodId));
     });
     _items = loadedProducts;
     notifyListeners();
   }
 
   Future<void> addProduct(Product product) async {
-    final body = json.encode({
-      'title': product.title,
-      'description': product.description,
-      'imageUrl': product.imageUrl,
-      'price': product.price,
-      'isFavorite': product.isFavorite,
-    });
+    final body = json.encode(product.toJson());
 
     try {
       final res = await http.post(uri, body: body);
@@ -72,12 +59,7 @@ class Products with ChangeNotifier {
     if (prodIndex >= 0) {
       final uri = Uri.parse(
           'https://the-shop-48986-default-rtdb.asia-southeast1.firebasedatabase.app/products/${product.id}.json');
-      final body = json.encode({
-        'title': product.title,
-        'description': product.description,
-        'imageUrl': product.imageUrl,
-        'price': product.price,
-      });
+      final body = json.encode(product.toJsonWithoutFav());
       await http.patch(uri, body: body);
 
       final newProduct = Product(
@@ -90,7 +72,7 @@ class Products with ChangeNotifier {
       );
       _items[prodIndex] = newProduct;
     } else {
-      print('No product found');
+      throw AppException('No product found');
     }
     notifyListeners();
   }
