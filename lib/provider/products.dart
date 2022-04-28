@@ -7,11 +7,12 @@ import 'package:the_shop/model/product.dart';
 
 class Products with ChangeNotifier {
   final String token;
+  final String userId;
   List<Product> _items = [];
   final url =
       'https://the-shop-48986-default-rtdb.asia-southeast1.firebasedatabase.app';
 
-  Products(this.token, this._items);
+  Products(this.token, this.userId, this._items);
 
   List<Product> get items {
     return [..._items];
@@ -22,16 +23,25 @@ class Products with ChangeNotifier {
   }
 
   Future<void> fetchAndSetProducts() async {
-    final uri = Uri.parse('$url/products.json?auth=$token');
+    var uri = Uri.parse('$url/products.json?auth=$token');
 
-    final res = await http.get(uri);
-    final resData = json.decode(res.body) as Map<String, dynamic>;
-    if (resData == null) {
+    var productsRes = await http.get(uri);
+    final productsData = json.decode(productsRes.body) as Map<String, dynamic>;
+    if (productsData == null) {
       return;
     }
+
+    uri = Uri.parse('$url/userFavorites/$userId.json?auth=$token');
+    var userFavRes = await http.get(uri);
+    final userFavData = json.decode(userFavRes.body) as Map<String, dynamic>;
+
     final List<Product> loadedProducts = [];
-    resData.forEach((prodId, prodData) {
-      loadedProducts.add(Product.fromJson(prodData, prodId));
+    productsData.forEach((prodId, prodData) {
+      loadedProducts.add(Product.fromJson(
+        prodData,
+        id: prodId,
+        isFavorite: userFavData == null ? false : userFavData[prodId] ?? false,
+      ));
     });
     _items = loadedProducts;
     notifyListeners();
