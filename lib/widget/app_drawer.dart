@@ -30,7 +30,6 @@ class AppDrawer extends StatelessWidget {
           ),
           Divider(),
           ListTile(
-            leading: Icon(Icons.exit_to_app),
             title: const Text('Manage Products'),
             onTap: () {
               Navigator.of(context)
@@ -39,8 +38,10 @@ class AppDrawer extends StatelessWidget {
           ),
           Divider(),
           ListTile(
+            leading: Icon(Icons.exit_to_app),
             title: const Text('Logout'),
             onTap: () {
+              Navigator.of(context).pushReplacementNamed('/');
               Provider.of<Auth>(context, listen: false).logout();
             },
           ),
