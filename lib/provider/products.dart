@@ -22,8 +22,12 @@ class Products with ChangeNotifier {
     return _items.where((product) => product.isFavorite).toList();
   }
 
-  Future<void> fetchAndSetProducts() async {
-    var uri = Uri.parse('$url/products.json?auth=$token');
+  Future<void> fetchAndSetProducts([bool filterByUser = false]) async {
+    Uri uri = Uri.parse('$url/products.json?auth=$token');
+    if (filterByUser) {
+      uri = Uri.parse(
+          '$url/products.json?auth=$token&orderBy="creatorId"&equalTo="$userId"');
+    }
 
     var productsRes = await http.get(uri);
     final productsData = json.decode(productsRes.body) as Map<String, dynamic>;
@@ -50,7 +54,7 @@ class Products with ChangeNotifier {
   Future<void> addProduct(Product product) async {
     final uri = Uri.parse('$url/products.json?auth=$token');
 
-    final body = json.encode(product.toJson());
+    final body = json.encode(product.toJson(userId));
 
     try {
       final res = await http.post(uri, body: body);
@@ -82,7 +86,6 @@ class Products with ChangeNotifier {
         description: product.description,
         price: product.price,
         imageUrl: product.imageUrl,
-        isFavorite: _items[prodIndex].isFavorite,
       );
       _items[prodIndex] = newProduct;
     } else {

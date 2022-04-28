@@ -10,8 +10,6 @@ class UserProductsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final products = Provider.of<Products>(context);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your Products'),
@@ -25,27 +23,41 @@ class UserProductsScreen extends StatelessWidget {
         ],
       ),
       drawer: AppDrawer(),
-      body: RefreshIndicator(
-        onRefresh: () => _refreshProducts(context),
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: ListView.builder(
-            itemCount: products.items.length,
-            itemBuilder: (ctx, i) => Column(
-              children: [
-                UserProductItem(
-                  prod: products.items[i],
+      body: FutureBuilder(
+        future: _refreshProducts(context),
+        builder: (ctx, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          return RefreshIndicator(
+            onRefresh: () => _refreshProducts(context),
+            child: Consumer<Products>(
+              builder: (ctx, products, _) => Padding(
+                padding: const EdgeInsets.all(8),
+                child: ListView.builder(
+                  itemCount: products.items.length,
+                  itemBuilder: (ctx, i) => Column(
+                    children: [
+                      UserProductItem(
+                        prod: products.items[i],
+                      ),
+                      Divider(),
+                    ],
+                  ),
                 ),
-                Divider(),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
 
   Future<void> _refreshProducts(BuildContext context) async {
-    await Provider.of<Products>(context, listen: false).fetchAndSetProducts();
+    await Provider.of<Products>(context, listen: false)
+        .fetchAndSetProducts(true);
   }
 }

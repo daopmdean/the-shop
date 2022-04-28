@@ -27,13 +27,14 @@ class Product with ChangeNotifier {
         price = json['price'],
         imageUrl = json['imageUrl'];
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson(String userId) => {
         'id': id,
         'title': title,
         'description': description,
         'price': price,
         'imageUrl': imageUrl,
         'isFavorite': isFavorite,
+        'creatorId': userId,
       };
 
   Map<String, dynamic> toJsonWithoutFav() => {
