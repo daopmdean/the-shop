@@ -7,10 +7,12 @@ import 'package:the_shop/model/cart_item.dart';
 import 'package:the_shop/model/order_item.dart';
 
 class Orders with ChangeNotifier {
+  final String token;
+  List<OrderItem> _orders = [];
   final url =
       'https://the-shop-48986-default-rtdb.asia-southeast1.firebasedatabase.app';
 
-  List<OrderItem> _orders = [];
+  Orders(this.token, this._orders);
 
   List<OrderItem> get orders {
     return [..._orders];
@@ -21,7 +23,7 @@ class Orders with ChangeNotifier {
   }
 
   Future<void> fetchOrders() async {
-    final uri = Uri.parse(url + '/orders.json');
+    final uri = Uri.parse(url + '/orders.json?auth=$token');
     final res = await http.get(uri);
     if (res.statusCode >= 400) {
       throw AppException('Fail to get orders');
@@ -55,7 +57,7 @@ class Orders with ChangeNotifier {
   }
 
   Future<void> addOrder(double total, List<CartItem> cartItems) async {
-    final uri = Uri.parse(url + '/orders.json');
+    final uri = Uri.parse(url + '/orders.json?auth=$token');
     final timeNow = DateTime.now();
     final body = json.encode({
       'cartItems': cartItems

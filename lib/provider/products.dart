@@ -2,14 +2,16 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:the_shop/dummy_data.dart';
 import 'package:the_shop/model/app_exception.dart';
 import 'package:the_shop/model/product.dart';
 
 class Products with ChangeNotifier {
-  final uri = Uri.parse(
-      'https://the-shop-48986-default-rtdb.asia-southeast1.firebasedatabase.app/products.json');
+  final String token;
   List<Product> _items = [];
+  final url =
+      'https://the-shop-48986-default-rtdb.asia-southeast1.firebasedatabase.app';
+
+  Products(this.token, this._items);
 
   List<Product> get items {
     return [..._items];
@@ -20,12 +22,13 @@ class Products with ChangeNotifier {
   }
 
   Future<void> fetchAndSetProducts() async {
+    final uri = Uri.parse('$url/products.json?auth=$token');
+
     final res = await http.get(uri);
     final resData = json.decode(res.body) as Map<String, dynamic>;
     if (resData == null) {
       return;
     }
-    print(resData);
     final List<Product> loadedProducts = [];
     resData.forEach((prodId, prodData) {
       loadedProducts.add(Product.fromJson(prodData, prodId));
@@ -35,6 +38,8 @@ class Products with ChangeNotifier {
   }
 
   Future<void> addProduct(Product product) async {
+    final uri = Uri.parse('$url/products.json?auth=$token');
+
     final body = json.encode(product.toJson());
 
     try {
@@ -57,8 +62,7 @@ class Products with ChangeNotifier {
   Future<void> updateProduct(Product product) async {
     final prodIndex = _items.indexWhere((prod) => prod.id == product.id);
     if (prodIndex >= 0) {
-      final uri = Uri.parse(
-          'https://the-shop-48986-default-rtdb.asia-southeast1.firebasedatabase.app/products/${product.id}.json');
+      final uri = Uri.parse('$url/products/${product.id}.json?auth=$token');
       final body = json.encode(product.toJsonWithoutFav());
       await http.patch(uri, body: body);
 
@@ -78,8 +82,7 @@ class Products with ChangeNotifier {
   }
 
   void deleteProduct(Product product) {
-    final uri = Uri.parse(
-        'https://the-shop-48986-default-rtdb.asia-southeast1.firebasedatabase.app/products/${product.id}.json');
+    final uri = Uri.parse('$url/products/${product.id}.json?auth=$token');
     final prodIndex = _items.indexWhere((prod) => prod.id == product.id);
     var prod = _items[prodIndex];
 
