@@ -14,16 +14,14 @@ class ProductDetailScreen extends StatelessWidget {
     ).findById(productId);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(prod.title),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              height: 300,
-              width: double.infinity,
-              child: Hero(
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 300,
+            pinned: true,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text(prod.title),
+              background: Hero(
                 tag: prod.id,
                 child: Image.network(
                   prod.imageUrl,
@@ -31,30 +29,35 @@ class ProductDetailScreen extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 10),
-            Text(
-              '\$${prod.price}',
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 30,
-              ),
-            ),
-            SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 10,
-              ),
-              child: Text(
-                prod.description,
+          ),
+          SliverList(
+            delegate: SliverChildListDelegate([
+              SizedBox(height: 10),
+              Text(
+                '\$${prod.price}',
                 textAlign: TextAlign.center,
-                softWrap: true,
                 style: TextStyle(
-                  fontSize: 20,
+                  color: Colors.grey,
+                  fontSize: 30,
                 ),
               ),
-            ),
-          ],
-        ),
+              SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                ),
+                child: Text(
+                  prod.description,
+                  textAlign: TextAlign.center,
+                  softWrap: true,
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+              ),
+            ]),
+          ),
+        ],
       ),
     );
   }
